@@ -1,0 +1,41 @@
+<VirtualHost IpAddress:443>
+SSLEngine On
+     SSLCertificateFile /etc/pki/tls/certs/.crt certificatepath
+     SSLCertificateKeyFile /etc/pki/tls/certs/.key file path
+     SSLCACertificateFile /etc/pki/tls/certs/.intermediate.crt file path
+  ServerName www.domainname.com
+  ServerAlias domainname.com
+  DocumentRoot /var/www/html/docrootfolder
+<Directory /var/www/html/docrootfolder>
+   <IfModule mod_mime.c>
+        AddType application/x-javascript .js
+        AddType text/css .css
+   </IfModule>
+  <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE text/css application/x-javascript text/x-component text/html text/plain text/xml application/javascript
+        <IfModule mod_setenvif.c>
+                BrowserMatch ^Mozilla/4 gzip-only-text/html
+                BrowserMatch ^Mozilla/4\.0[678] no-gzip
+                BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+        </IfModule>
+    </IfModule>
+    Header append Vary User-Agent env=!dont-vary
+</Directory>
+  ErrorLog logs/domainname.com-error.log
+  CustomLog logs/domainname.com-access.log common
+
+</VirtualHost>
+
+
+<VirtualHost IpAddress:80>
+  ServerName www.domainname.com
+  ServerAlias domainname.com
+  DocumentRoot /var/www/html/docrootfolder
+  ErrorLog logs/domainname.com-error.log
+  CustomLog logs/domainname.com-access.log common
+   RewriteEngine On
+   RewriteCond %{HTTPS} !on
+   RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+
+</VirtualHost>
+
